@@ -1,0 +1,6 @@
+{
+  "modelPath": "data/archimate-scribe-demo-model.xml",
+  "viewsFilterByProperty": false,
+  "viewsFilterPropertyName": "AI-Context",
+  "serverPort": 3030
+}
