@@ -1,84 +1,97 @@
 # ArchiScribe MCP Server
 
-A Model Context Protocol (MCP) server for requesting information from an ArchiMate model. MCP tools are used to search and retrieve information from views within the configured model.
+The **ArchiScribe MCP Server** is a Model Context Protocol (MCP) server designed to query and retrieve architectural information from an ArchiMate model. It enables AI coding assistants and agents to access architectural context during the software development lifecycle (SDLC), delivering model insights in markdown format, ideal for modern language models.
 
-The MCP can be used during the SDLC, to provide architectural context directly to engineers using AI coding assistants/agents with MPC server integration. The architecture details are provided to the coding assistant in markdown format which is easily understood by modern LLMs.
+> **Note:** The model file must be in the **ArchiMate Exchange File (.xml)** format.
 
-***The configured model file must be in the ArchiMate Exchange File format.***
+---
 
 ## Installation
 
 Install dependencies:
 
-```powershell
+```bash
 npm install
 ```
 
+---
+
 ## Running the Server
 
-### Development Mode (Recommended for development)
+### Development Mode
 
 Run with automatic restart on file changes:
 
-```powershell
+```bash
 npm run dev
 ```
 
-This uses `ts-node-dev` to run the TypeScript source directly and restart automatically when files change.
+Uses `ts-node-dev` to execute TypeScript directly and restart on changes.
 
 ### Production Mode
 
-Build and run the compiled JavaScript:
+Compile and run the server:
 
-```powershell
+```bash
 npm run build
 npm start
 ```
 
-### Available Scripts
+---
 
-- `npm run dev` - Start in development mode with auto-restart
-- `npm run build` - Compile TypeScript to JavaScript in `dist/` folder
-- `npm start` - Start the compiled server from `dist/mcp/index.js`
-- `npm test` - Run the test suite
+## Available Scripts
 
-### Server Configuration
+| Script             | Description                                      |
+|--------------------|--------------------------------------------------|
+| `npm run dev`      | Start in development mode with auto-restart      |
+| `npm run build`    | Compile TypeScript to JavaScript in `dist/`      |
+| `npm start`        | Run the compiled server from `dist/mcp/index.js` |
+| `npm test`         | Execute the test suite                           |
 
-The server will start on port 3030 by default. You can override this by:
+---
 
-1. **Environment variable**: Set `SERVER_PORT` environment variable
-   ```powershell
-   $env:SERVER_PORT=8080; npm start
-   ```
+## Configuration
 
-2. **Config file**: Edit `config/settings.json` and change the `serverPort` value
+### Server Port
 
-Model file (ArchiMate) configuration
+Default port: `3030`. You can override it via:
 
-The path to the ArchiMate model file is configured with the `modelPath` key in `config/settings.json` or via the `MODEL_PATH` environment variable. The server requires a model path to be set and will throw an error if none is provided.
+- **Environment variable**:
+  ```powershell
+  $env:SERVER_PORT=8080; npm start
+  ```
 
-- Example (config file):
+- **Config file**: Edit `config/settings.json`:
+  ```json
+  {
+    "serverPort": 8080
+  }
+  ```
 
-```json
-{
-  "modelPath": "data/archimate-scribe-demo-model.xml"
-}
-```
+### Model File Path
 
-- Example (PowerShell, environment variable):
+Specify the path to your ArchiMate model via:
 
-```powershell
-$env:MODEL_PATH='C:\path\to\your\model.xml'; npm start
-```
+- **Environment variable**:
+  ```powershell
+  $env:MODEL_PATH='C:\path\to\your\model.xml'; npm start
+  ```
 
-Notes:
+- **Config file**:
+  ```json
+  {
+    "modelPath": "data/archimate-scribe-demo-model.xml"
+  }
+  ```
 
-- The value may be an absolute path or a path relative to the project root. The default demo model shipped with the repo is `data/archimate-scribe-demo-model.xml`.
-- After changing `config/settings.json` or setting `MODEL_PATH`, restart the server so the new value is picked up.
+Supports both absolute and relative paths. Restart the server after changes.
 
-### Verifying the Server
+---
 
-Once started, you should see output like:
+## Verifying the Server
+
+On successful startup, you should see:
+
 ```
 MCP SDK: using high-level McpServer API
 MCP: registered high-level tool: SearchViews
@@ -86,54 +99,61 @@ MCP: registered high-level tool: GetViewDetails
 Server listening on port 3030
 ```
 
+---
+
 ## MCP Tools
 
-This server provides two MCP tools:
+The server exposes two MCP tools:
 
-- **SearchViews**: Search view names in the ArchiMate model
-  - Input: `query` (optional string) - search keyword to filter view names
-  - Output: Markdown list of matching view names
+### SearchViews
 
-- **GetViewDetails**: Get detailed information for a specific view
-  - Input: `viewname` (required string) - exact name of the view
-  - Output: Markdown document with view metadata, elements, and relationships
+- **Input**: `query` (optional string) — keyword to filter view names
+- **Output**: Markdown list of matching views
 
-## HTTP API (for testing)
+### GetViewDetails
 
-The server also exposes HTTP endpoints for quick testing:
+- **Input**: `viewname` (required string) — exact name of the view
+- **Output**: Markdown document with metadata, elements, and relationships
+
+---
+
+## HTTP API
+
+Quick testing via HTTP endpoints:
 
 - GET `/views?q=<keyword>`
-  - Returns a Markdown list of view names that match the optional keyword
-  - Example:
-
-```powershell
-Invoke-RestMethod -Uri "http://localhost:3030/views?q=dataflow" -Method Get
-```
+  - Returns a markdown list of view names matching the keyword.
 
 - GET `/views/{viewname}`
-  - Returns a Markdown document with view metadata, elements, and relationships
-  - Example:
+  - Returns detailed markdown for the specified view.
 
-```powershell
-Invoke-RestMethod -Uri "http://localhost:3030/views/Dataflow" -Method Get
-```
+---
 
 ## MCP Transport
 
-The server supports MCP over HTTP at the `/mcp` endpoint for integration with MCP clients.
+Supports MCP over HTTP at the `/mcp` endpoint for integration with MCP clients.
 
-### Example config in VS Code
+### VS Code Configuration
+
 ```json
-  "archiscribe": {
-    "url": "http://localhost:3030/mcp",
-    "type": "http"
-  }
+"archiscribe": {
+  "url": "http://localhost:3030/mcp",
+  "type": "http"
+}
 ```
 
-## Configuration
+---
 
-- Server configuration is in `config/settings.json` 
-- Default port: 3030
-- Model file: `src/data/archimate-scribe-demo-model.xml`
-- View filtering can be configured via `viewsFilterByProperty` and `viewsFilterPropertyName` settings
+## Advanced Configuration
 
+- Config file: `config/settings.json`
+- Default model file: `src/data/archimate-scribe-demo-model.xml`
+- Optional view filtering, based on a property set on each view in the model:
+  ```json
+  {
+    "viewsFilterByProperty": true,
+    "viewsFilterPropertyName": "yourPropertyName"
+  }
+  ```
+
+---
