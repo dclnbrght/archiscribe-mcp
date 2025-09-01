@@ -6,6 +6,19 @@ The **ArchiScribe MCP Server** is a Model Context Protocol (MCP) server designed
 
 ---
 
+## Example
+
+Here is a simple example from the demo model (/data/archimate-scribe-demo-model.xml).
+
+This view depicts the ArchiScribe MCP Server reading a model file and Serving an AI Coding Agent, via it's MCP interface.
+
+- [ArchiScribe MCP Server raw output](/data/archiScribe-MCP-Server-view.md)
+- [AI generated documentation from the output](/data/archiscribe-MCP-Server-documentation.md)
+
+![archiscribe-archimate-view](/img/archiscribe-archimate-view.png)
+
+---
+
 ## Installation
 
 Install dependencies:
@@ -18,6 +31,15 @@ npm install
 
 ## Running the Server
 
+### Production Mode
+
+Compile and run the server:
+
+```bash
+npm run build
+npm start
+```
+
 ### Development Mode
 
 Run with automatic restart on file changes:
@@ -27,15 +49,6 @@ npm run dev
 ```
 
 Uses `ts-node-dev` to execute TypeScript directly and restart on changes.
-
-### Production Mode
-
-Compile and run the server:
-
-```bash
-npm run build
-npm start
-```
 
 ---
 
@@ -80,7 +93,7 @@ Specify the path to your ArchiMate model via:
 - **Config file**:
   ```json
   {
-    "modelPath": "data/archimate-scribe-demo-model.xml"
+    "modelPath": "data/your-model.xml"
   }
   ```
 
@@ -107,7 +120,7 @@ The server exposes two MCP tools:
 
 ### SearchViews
 
-- **Input**: `query` (optional string) — keyword to filter view names
+- **Input**: `keyword` (optional string) — keyword to filter view names
 - **Output**: Markdown list of matching views
 
 ### GetViewDetails
@@ -148,7 +161,7 @@ Supports MCP over HTTP at the `/mcp` endpoint for integration with MCP clients.
 
 - Config file: `config/settings.json`
 - Default model file: `src/data/archimate-scribe-demo-model.xml`
-- Optional view filtering, based on a property set on each view in the model:
+- Optional view filtering, based on a property set on views in the model:
   ```json
   {
     "viewsFilterByProperty": true,

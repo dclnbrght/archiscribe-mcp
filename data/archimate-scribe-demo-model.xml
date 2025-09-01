@@ -30,8 +30,30 @@
     <element identifier="id-74986ddc9b5d4a61b9c173c37c966fa1" xsi:type="ApplicationInterface">
       <name xml:lang="en">App Interface</name>
     </element>
+    <element identifier="id-b81d9ade775a461f812c1afcb234c278" xsi:type="ApplicationComponent">
+      <name xml:lang="en">ArchiScribe MCP Server</name>
+      <documentation xml:lang="en">A Model Context Protocol (MCP) server for providing AI agents with access to information in an ArchiMate model.</documentation>
+      <properties>
+        <property propertyDefinitionRef="propid-3">
+          <value xml:lang="en">https://github.com/dclnbrght/archiscribe-mcp</value>
+        </property>
+      </properties>
+    </element>
+    <element identifier="id-f80e40aa9b764fc586011a42b7861a17" xsi:type="ApplicationInterface">
+      <name xml:lang="en">MCP Interface</name>
+      <documentation xml:lang="en">A streamable HTTP interface.&#xD;
+https://modelcontextprotocol.io/specification/2025-03-26/basic/transports#streamable-http</documentation>
+    </element>
     <element identifier="id-ea8cb1f5d9c941c18bb8521e00394514" xsi:type="SystemSoftware">
       <name xml:lang="en">RDBMS</name>
+    </element>
+    <element identifier="id-50d6ff17f5504615bb91ed0f17a80ebd" xsi:type="Artifact">
+      <name xml:lang="en">ArchiMate Model</name>
+      <documentation xml:lang="en">Any ArchiMate Model file, in the ArchiMate Exchange Format (an XML‑based interoperability standard).</documentation>
+    </element>
+    <element identifier="id-bb154ae65a134c64b508b309305f4aa1" xsi:type="SystemSoftware">
+      <name xml:lang="en">AI Coding Agent</name>
+      <documentation xml:lang="en">AI coding agent such as Github Copilot or Cursor, incorporated into a software engineer's IDE.</documentation>
     </element>
   </elements>
   <relationships>
@@ -42,50 +64,29 @@
       <name xml:lang="en">Client Data Access</name>
       <documentation xml:lang="en">Public facing data access</documentation>
       <properties>
-        <property propertyDefinitionRef="propid-3">
+        <property propertyDefinitionRef="propid-4">
           <value xml:lang="en">HTTPS</value>
         </property>
       </properties>
     </relationship>
     <relationship identifier="id-98bd9159d3324e2eac6ab77740e6a210" source="id-a20e0fdd428947779f0783fd831bfe3d" target="id-954b9fa6754f4ca18746fa9da71068b9" xsi:type="Flow" />
     <relationship identifier="id-b5c3c4b6bf6849c28326ed45023ba92f" source="id-954b9fa6754f4ca18746fa9da71068b9" target="id-74986ddc9b5d4a61b9c173c37c966fa1" xsi:type="Composition" />
+    <relationship identifier="id-b7188d041ecb47e6ac58634218a20a9a" source="id-b81d9ade775a461f812c1afcb234c278" target="id-50d6ff17f5504615bb91ed0f17a80ebd" xsi:type="Access" accessType="Read" />
+    <relationship identifier="id-4dadae25da614f99a0c48384603b2a8c" source="id-b81d9ade775a461f812c1afcb234c278" target="id-f80e40aa9b764fc586011a42b7861a17" xsi:type="Composition" />
+    <relationship identifier="id-44ce39334ae64f70a552698e495076e8" source="id-f80e40aa9b764fc586011a42b7861a17" target="id-bb154ae65a134c64b508b309305f4aa1" xsi:type="Serving" />
   </relationships>
-  <organizations>
-    <item>
-      <label xml:lang="en">Application</label>
-      <item identifierRef="id-c578aa43d732486499d233cb4d9a1e28" />
-      <item identifierRef="id-954b9fa6754f4ca18746fa9da71068b9" />
-      <item identifierRef="id-a20e0fdd428947779f0783fd831bfe3d" />
-      <item identifierRef="id-74986ddc9b5d4a61b9c173c37c966fa1" />
-    </item>
-    <item>
-      <label xml:lang="en">Technology &amp; Physical</label>
-      <item identifierRef="id-ea8cb1f5d9c941c18bb8521e00394514" />
-    </item>
-    <item>
-      <label xml:lang="en">Relations</label>
-      <item identifierRef="id-54a6e53963e349c6bde565c2b301e239" />
-      <item identifierRef="id-3829343d59e14e7a98dd6ea2655fde04" />
-      <item identifierRef="id-926dfdb9dc504b1087fa4c6c5693668b" />
-      <item identifierRef="id-4c41608abbea43e6a4b7314f8942931f" />
-      <item identifierRef="id-98bd9159d3324e2eac6ab77740e6a210" />
-      <item identifierRef="id-b5c3c4b6bf6849c28326ed45023ba92f" />
-    </item>
-    <item>
-      <label xml:lang="en">Views</label>
-      <item identifierRef="id-46cdf69b5bef47f2818cf7632ed5837a" />
-      <item identifierRef="id-a79829a528f341969a2503e64dacdb30" />
-    </item>
-  </organizations>
   <propertyDefinitions>
-    <propertyDefinition identifier="propid-4" type="string">
+    <propertyDefinition identifier="propid-5" type="string">
       <name>AI-Context</name>
     </propertyDefinition>
     <propertyDefinition identifier="propid-2" type="string">
       <name>Port</name>
     </propertyDefinition>
-    <propertyDefinition identifier="propid-3" type="string">
+    <propertyDefinition identifier="propid-4" type="string">
       <name>Protocol</name>
+    </propertyDefinition>
+    <propertyDefinition identifier="propid-3" type="string">
+      <name>Repo</name>
     </propertyDefinition>
     <propertyDefinition identifier="propid-1" type="string">
       <name>Repository</name>
@@ -169,7 +170,7 @@
         <name xml:lang="en">Dataflow View</name>
         <documentation xml:lang="en">This view shows the data flows of the primary system components.</documentation>
         <properties>
-          <property propertyDefinitionRef="propid-4">
+          <property propertyDefinitionRef="propid-5">
             <value xml:lang="en">true</value>
           </property>
         </properties>
@@ -218,6 +219,63 @@
           </style>
         </connection>
         <connection identifier="id-5d3896ea898548c486320aba78b5ddfe" relationshipRef="id-98bd9159d3324e2eac6ab77740e6a210" xsi:type="Relationship" source="id-dcafbdcc09a74f8c9729df72c665ef79" target="id-2d34699adba24470b421904c81e6af6f">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Segoe UI" size="9">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+      </view>
+      <view identifier="id-0762d5499a8f4fa3baeadc52a3a297be" xsi:type="Diagram" viewpoint="Implementation and Deployment">
+        <name xml:lang="en">ArchiScribe MCP Server</name>
+        <documentation xml:lang="en">The Application and Technology components of the ArchiScribe MCP Server.&#xD;
+More information here: https://declanbright.com/software/archiscribe-mcp-server/</documentation>
+        <node identifier="id-bcb98031144d4af5be821a6b6360176e" elementRef="id-50d6ff17f5504615bb91ed0f17a80ebd" xsi:type="Element" x="24" y="192" w="178" h="55">
+          <style>
+            <fillColor r="201" g="231" b="183" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Segoe UI" size="9">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <node identifier="id-da29a630b1a9406397923cbc14d4bca1" elementRef="id-b81d9ade775a461f812c1afcb234c278" xsi:type="Element" x="24" y="108" w="178" h="55">
+          <style>
+            <fillColor r="181" g="255" b="255" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Segoe UI" size="9" style="bold">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+          <node identifier="id-9877e999a417453199a3b6174ad8411a" elementRef="id-f80e40aa9b764fc586011a42b7861a17" xsi:type="Element" x="48" y="108" w="127" h="25">
+            <style>
+              <fillColor r="181" g="255" b="255" a="100" />
+              <lineColor r="92" g="92" b="92" a="100" />
+              <font name="Segoe UI" size="9">
+                <color r="0" g="0" b="0" />
+              </font>
+            </style>
+          </node>
+        </node>
+        <node identifier="id-e8c6dd367c894b46a06c5a9fffccf903" elementRef="id-bb154ae65a134c64b508b309305f4aa1" xsi:type="Element" x="24" y="24" w="178" h="55">
+          <style>
+            <fillColor r="201" g="231" b="183" a="100" />
+            <lineColor r="92" g="92" b="92" a="100" />
+            <font name="Segoe UI" size="9">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </node>
+        <connection identifier="id-a55d92af47d440a2a1df544e7be5b753" relationshipRef="id-b7188d041ecb47e6ac58634218a20a9a" xsi:type="Relationship" source="id-da29a630b1a9406397923cbc14d4bca1" target="id-bcb98031144d4af5be821a6b6360176e">
+          <style>
+            <lineColor r="0" g="0" b="0" />
+            <font name="Segoe UI" size="9">
+              <color r="0" g="0" b="0" />
+            </font>
+          </style>
+        </connection>
+        <connection identifier="id-c8be48f7cf484b5bb5a3490fd97c1a7c" relationshipRef="id-44ce39334ae64f70a552698e495076e8" xsi:type="Relationship" source="id-9877e999a417453199a3b6174ad8411a" target="id-e8c6dd367c894b46a06c5a9fffccf903">
           <style>
             <lineColor r="0" g="0" b="0" />
             <font name="Segoe UI" size="9">

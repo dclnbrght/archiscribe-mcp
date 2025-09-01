@@ -32,7 +32,9 @@ This view shows the data flows of the primary system components.
   - Documentation: Public facing data access
   - Properties:
     - Protocol: HTTPS
-- From **API Gateway Service** to **App Interface**
-  - Type: Composition
+
 - From **Core Application Service** to **API Gateway Service**
   - Type: Flow
+
+- From **API Gateway Service** to **App Interface**
+  - Type: Composition (implicit from view nesting)
