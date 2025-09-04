@@ -17,6 +17,7 @@ export interface GetViewDetailsInput {
 }
 
 export interface GetViewDetailsOutput {
+  id?: string;
   markdown: string;
   [key: string]: unknown; // MCP compatibility
 }
@@ -26,8 +27,8 @@ function createSearchViewsOutput(markdown: string): SearchViewsOutput {
   return { markdown };
 }
 
-function createGetViewDetailsOutput(markdown: string): GetViewDetailsOutput {
-  return { markdown };
+function createGetViewDetailsOutput(markdown: string, id?: string): GetViewDetailsOutput {
+  return { markdown, id };
 }
 
 export function createTools(modelPath?: string) {
@@ -55,7 +56,7 @@ export function createTools(modelPath?: string) {
       || model.views.find(x => (x.name || '').toLowerCase().includes(input.viewname.toLowerCase()));
     if (!v) return createGetViewDetailsOutput(`# View not found: ${input.viewname}`);
     const markdown = renderViewDetailsMarkdownFromModel(model, v);
-    return createGetViewDetailsOutput(markdown);
+    return createGetViewDetailsOutput(markdown, v.id);
   }
 
   return { searchViewsHandler, getViewDetailsHandler, loader };

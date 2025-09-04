@@ -17,5 +17,7 @@ describe('MCP tools', () => {
     const result = await tools.getViewDetailsHandler({ viewname: 'Dataflow View' });
     expect(result.markdown).toContain('ArchiMate View name: Dataflow View');
     expect(result.markdown).toContain('Elements');
+    expect(result.id).toBeTypeOf('string');
+    expect(result.id && result.id.length).toBeGreaterThan(0);
   });
 });
