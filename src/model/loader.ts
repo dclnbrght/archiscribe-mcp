@@ -1,5 +1,6 @@
 import { ModelData, ViewObject, ElementObject, RelationshipObject } from './types';
 import { readFileSync } from 'fs';
+import { watchFile } from 'fs';
 import { XMLParser } from 'fast-xml-parser';
 
 function attr(obj: any, name: string) {
@@ -19,9 +20,28 @@ function asArray<T>(v: any): T[] {
 export class ModelLoader {
   private path: string;
   private cache?: ModelData;
+  private watcherInitialized: boolean = false;
 
   constructor(path: string) {
     this.path = path;
+    this.initWatcher();
+  }
+
+  private initWatcher() {
+    if (this.watcherInitialized) return;
+    try {
+      watchFile(this.path, { persistent: true, interval: 5000 }, (curr, prev) => {
+        if (curr.mtime !== prev.mtime) {
+          this.cache = undefined;
+          // Log to output when file watcher triggers, with timestamp
+          const ts = new Date().toISOString();
+          console.log(`[${ts}] [ModelLoader] Model file updated: ${this.path}. Cache cleared.`);
+        }
+      });
+      this.watcherInitialized = true;
+    } catch (err) {
+      // Ignore watcher errors
+    }
   }
 
   load(): ModelData {
