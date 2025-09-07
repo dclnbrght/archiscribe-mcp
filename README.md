@@ -1,8 +1,10 @@
 # ArchiScribe MCP Server
 
-The **ArchiScribe MCP Server** is a Model Context Protocol (MCP) server designed to query and retrieve architectural information from an ArchiMate model. It enables AI coding assistants and agents to access architectural context during the software development lifecycle (SDLC), delivering model insights in markdown format, ideal for modern language models.
+The **ArchiScribe MCP Server** is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro) server designed to retrieve architectural information from an ArchiMate model. It enables AI coding assistants and agents to access architectural context information during the software development lifecycle (SDLC). The information is returned in markdown format, which is easily understood by LLMs.
 
-> **Note:** The model file must be in the **ArchiMate Exchange File (.xml)** format.
+> **Warning:** This MCP server is only suitable for local deployment, on a user's computer. There are no security controls, therefore it is not secure to deploy it to a remote server.
+
+> **Note:** The model file must be in the **[ArchiMate Exchange File (.xml)](https://www.opengroup.org/open-group-archimate-model-exchange-file-format)** format.
 
 ---
 
@@ -120,7 +122,7 @@ The server exposes two MCP tools:
 
 ### SearchViews
 
-- **Input**: `keyword` (optional string) — keyword to filter view names
+- **Input**: `keyword` (optional string) — keyword to search for view names
 - **Output**: Markdown list of matching views
 
 ### GetViewDetails
@@ -160,8 +162,8 @@ Supports MCP over HTTP at the `/mcp` endpoint for integration with MCP clients.
 ## Advanced Configuration
 
 - Config file: `config/settings.json`
-- Default model file: `src/data/archimate-scribe-demo-model.xml`
-- Optional view filtering, based on a property set on views in the model:
+- Default model file: `data/archimate-scribe-demo-model.xml`
+- Optional view filtering, based on a property set on the views in the model:
   ```json
   {
     "viewsFilterByProperty": true,

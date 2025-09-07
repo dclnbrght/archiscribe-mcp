@@ -2,7 +2,7 @@ import { ViewObject, ElementObject, RelationshipObject, ModelData } from '../mod
 
 export function renderViewListMarkdown(views: ViewObject[]): string {
   if (!views || views.length === 0) return '# Views\n\n_No views found_';
-  const lines: string[] = ['# Views', ''];
+  const lines: string[] = ['# ArchiMate Views', ''];
   for (const v of views) {
     lines.push(`- ${v.name}`);
   }
