@@ -1,11 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { appService } from '../services/app';
+import { getLogger } from '../utils/logger';
 
 export class Router {
   async handle(req: IncomingMessage, res: ServerResponse) {
     const url = parse(req.url || '', true);
     const pathname = url.pathname || '/';
+  const logger = getLogger();
 
     if (req.method === 'GET' && pathname === '/health') {
       res.statusCode = 200;
@@ -18,7 +20,10 @@ export class Router {
       if (req.method === 'GET' && pathname === '/views') {
         const q = (url.query && (url.query.q || url.query.query)) || url.query?.query || '';
         const input = { query: String(q || '') };
-        const out = await appService.tools.searchViewsHandler(input);
+        const out = await logger.auditHttpInvocation(
+          'GET', '/views', input, 
+          async () => appService.tools.searchViewsHandler(input)
+        );
         res.statusCode = 200;
         res.setHeader('content-type', 'text/markdown');
         res.end(out.markdown);
@@ -27,7 +32,10 @@ export class Router {
 
       if (req.method === 'GET' && pathname && pathname.startsWith('/views/')) {
         const name = decodeURIComponent(pathname.replace('/views/', ''));
-        const out = await appService.tools.getViewDetailsHandler({ viewname: name });
+        const out = await logger.auditHttpInvocation(
+          'GET', '/views/:name', { viewname: name }, 
+          async () => appService.tools.getViewDetailsHandler({ viewname: name })
+        );
         res.statusCode = 200;
         res.setHeader('content-type', 'text/markdown');
         res.end(out.markdown);

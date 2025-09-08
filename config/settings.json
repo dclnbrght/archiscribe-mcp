@@ -2,5 +2,7 @@
   "modelPath": "data/archimate-scribe-demo-model.xml",
   "viewsFilterByProperty": false,
   "viewsFilterPropertyName": "AI-Context",
-  "serverPort": 3030
+  "serverPort": 3030,
+  "logPath": "logs",
+  "logLevel": "info"
 }

@@ -172,3 +172,66 @@ Supports MCP over HTTP at the `/mcp` endpoint for integration with MCP clients.
   ```
 
 ---
+
+## Logging & Audit Trail
+
+Every MCP tool invocation and HTTP request to `/views` or `/views/{viewname}` is logged as a structured JSON line (NDJSON) for audit purposes.
+
+### Log Location
+
+Logs are written to a daily file in the directory specified by `logPath` (default: `logs`).
+File name pattern:
+
+```
+archiscribe-YYYY-MM-DD.log
+```
+
+Each line is a JSON object, for example:
+
+```
+{"ts":"2025-09-08T10:15:23.456Z","level":"info","event":"tool.invoke","tool":"SearchViews","params":{"query":"Data"},"durationMs":12,"success":true}
+```
+
+### Fields
+
+| Field | Description |
+|-------|-------------|
+| ts | ISO8601 UTC timestamp |
+| level | debug | info | warn | error |
+| event | `tool.invoke` or `http.request` |
+| tool | Tool name (for tool events) |
+| method | HTTP method (for http events) |
+| path | Normalized path (e.g. `/views/:name`) |
+| params | Sanitized input parameters (truncated if large) |
+| durationMs | Execution time in milliseconds |
+| success | Boolean outcome |
+| error | Error message if failed |
+
+### Configuration
+
+Add (or edit) in `config/settings.json`:
+
+```jsonc
+{
+  "logPath": "logs",
+  "logLevel": "info"
+}
+```
+
+Override via environment variables:
+
+```powershell
+$env:LOG_PATH='C:\\temp\\archiscribe-logs'
+$env:LOG_LEVEL='warn'
+npm start
+```
+
+### Adjusting Verbosity
+
+Allowed levels: `debug`, `info`, `warn`, `error`. Only events at or above the configured level are persisted. Audit invocations are logged at `info` or `error` (failures) so set `logLevel` to `info` to retain full audit trail.
+
+### Failure Handling
+
+If the logger can't write to disk (permission or path issues) it falls back to console logging with a single warning. Log writes never crash the server.
+
+---
