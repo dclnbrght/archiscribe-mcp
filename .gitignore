@@ -4,4 +4,4 @@ dist/
 /.vscode/
 *.archimate
 *.archimate.bak
-.log
+/logs/
