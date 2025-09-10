@@ -35,6 +35,13 @@ export function createTools(modelPath?: string) {
   const cfg = loadConfig();
   const loader = new ModelLoader(modelPath || cfg.modelPath);
   const logger = getLogger();
+  const DISCLAIMER_PREFIX = cfg.disclaimerPrefix || '';
+
+  // Add disclaimer at the start of the markdown, to reduce risk of prompt injection
+  function withDisclaimer(md: string): string {
+    if (!md) return DISCLAIMER_PREFIX;
+    return md.startsWith(DISCLAIMER_PREFIX) ? md : DISCLAIMER_PREFIX + md;
+  }
 
   async function searchViewsHandler(input: SearchViewsInput): Promise<SearchViewsOutput> {
     return logger.auditToolInvocation('SearchViews', input, async () => {
@@ -46,7 +53,7 @@ export function createTools(modelPath?: string) {
         const pname = cfg.viewsFilterPropertyName;
         views = views.filter(v => v.properties && Object.prototype.hasOwnProperty.call(v.properties, pname));
       }
-      const markdown = renderViewListMarkdown(views);
+      const markdown = withDisclaimer(renderViewListMarkdown(views));
       const out = createSearchViewsOutput(markdown);
       (out as any).__audit = {
         resultCount: views.length
@@ -68,7 +75,7 @@ export function createTools(modelPath?: string) {
         (out as any).__audit = { found: false };
         return out;
       }
-      const markdown = renderViewDetailsMarkdownFromModel(model, v);
+      const markdown = withDisclaimer(renderViewDetailsMarkdownFromModel(model, v));
       out = createGetViewDetailsOutput(markdown, v.id);
       (out as any).__audit = { found: true, viewId: v.id };
       return out;

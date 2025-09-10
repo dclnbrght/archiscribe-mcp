@@ -8,6 +8,7 @@ export interface Config {
   serverPort: number;
   logPath: string;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
+  disclaimerPrefix?: string;
 }
 
 function readSettings(): Partial<Config> {
@@ -36,5 +37,6 @@ export function loadConfig(): Config {
     serverPort: Number(process.env.SERVER_PORT || defaults.serverPort || 3030),
     logPath: process.env.LOG_PATH || (defaults as any).logPath || 'logs',
     logLevel: (process.env.LOG_LEVEL as any) || (defaults as any).logLevel || 'info',
+    disclaimerPrefix: process.env.DISCLAIMER_PREFIX || (defaults as any).disclaimerPrefix || ''
   };
 }
