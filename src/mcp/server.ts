@@ -1,5 +1,6 @@
 import { appService } from '../services/app';
 import { z } from 'zod';
+import { getLogger } from '../utils/logger';
 
 type SdkServer = any;
 
@@ -9,12 +10,14 @@ type SdkServer = any;
 export async function createMcpServer() {
   const tools = appService.tools;
   let sdkServer: SdkServer | null = null;
+  const logger = getLogger();
   
   try {
     // Try to load the high-level McpServer (preferred approach)
     const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
     
     console.info('MCP SDK: using high-level McpServer API');
+    logger.log('info', 'mcp.init', { message: 'Using high-level McpServer API' });
     
     const server = new McpServer(
       { name: 'ArchiScribe MCP', version: '0.1.0' }, 
@@ -37,6 +40,7 @@ export async function createMcpServer() {
       }
     );
     console.info('MCP: registered high-level tool: SearchViews');
+    logger.log('info', 'mcp.tool.register', { tool: 'SearchViews', highLevel: true });
 
     // Register the GetViewDetails tool
     server.registerTool(
@@ -54,21 +58,34 @@ export async function createMcpServer() {
       }
     );
     console.info('MCP: registered high-level tool: GetViewDetails');
+    logger.log('info', 'mcp.tool.register', { tool: 'GetViewDetails', highLevel: true });
 
     sdkServer = server;
   } catch (err) {
     // SDK not available or registration failed; continue with in-process tools only
-    console.warn('MCP SDK not loaded, falling back to in-process tools only:', (err as Error)?.message || err);
+    const msg = (err as Error)?.message || String(err);
+    console.warn('MCP SDK not loaded, falling back to in-process tools only:', msg);
+    logger.log('warn', 'mcp.init.fallback', { message: 'SDK not loaded, using in-process tools', error: msg });
     sdkServer = null;
   }
 
   async function start() {
-    if (sdkServer && typeof sdkServer.start === 'function') await sdkServer.start();
+    if (sdkServer && typeof sdkServer.start === 'function') {
+      await sdkServer.start();
+      logger.log('info', 'mcp.server.start', { mode: 'sdk', tools: Object.keys(tools) });
+    } else {
+      logger.log('info', 'mcp.server.start', { mode: 'in-process', tools: Object.keys(tools) });
+    }
     return { tools };
   }
 
   async function stop() {
-    if (sdkServer && typeof sdkServer.stop === 'function') await sdkServer.stop();
+    if (sdkServer && typeof sdkServer.stop === 'function') {
+      await sdkServer.stop();
+      logger.log('info', 'mcp.server.stop', { mode: 'sdk' });
+    } else {
+      logger.log('info', 'mcp.server.stop', { mode: 'in-process' });
+    }
     return;
   }
 

@@ -3,6 +3,9 @@ import { Router } from '../api/router';
 import { createMcpServer } from './server';
 import { appService } from '../services/app';
 import { createJsonRpcError, handleMcpError } from '../utils/errors';
+import { getLogger } from '../utils/logger';
+
+const logger = getLogger();
 
 const port = Number(process.env.PORT || appService.config.serverPort);
 
@@ -53,8 +56,10 @@ async function main() {
   // Start the MCP server if it has SDK backing so transports and notifications are initialized
   try {
     await mcp.start();
+    logger.log('info', 'server.mcp.start', { success: true });
   } catch (err) {
     console.warn('MCP server start() failed:', (err as Error)?.message || err);
+    logger.log('warn', 'server.mcp.start', { success: false, error: (err as Error)?.message || String(err) });
   }
 
   const server = createServer(async (req, res) => {
@@ -78,15 +83,18 @@ async function main() {
       res.setHeader('content-type', 'text/plain');
       res.end('Internal Server Error');
       console.error(err);
+      logger.log('error', 'http.unhandled', { error: (err as Error)?.message || err });
     });
   });
 
   server.listen(Number(port), () => {
     console.log(`Server listening on port ${port}`);
+    logger.log('info', 'server.listen', { port });
   });
 }
 
 main().catch(err => {
   console.error('Failed to start server', err);
+  logger.log('error', 'server.start.fail', { error: (err as Error)?.message || String(err) });
   process.exit(1);
 });

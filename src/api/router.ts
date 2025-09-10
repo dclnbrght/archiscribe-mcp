@@ -7,7 +7,7 @@ export class Router {
   async handle(req: IncomingMessage, res: ServerResponse) {
     const url = parse(req.url || '', true);
     const pathname = url.pathname || '/';
-  const logger = getLogger();
+    const logger = getLogger();
 
     if (req.method === 'GET' && pathname === '/health') {
       res.statusCode = 200;

@@ -47,7 +47,11 @@ export function createTools(modelPath?: string) {
         views = views.filter(v => v.properties && Object.prototype.hasOwnProperty.call(v.properties, pname));
       }
       const markdown = renderViewListMarkdown(views);
-      return createSearchViewsOutput(markdown);
+      const out = createSearchViewsOutput(markdown);
+      (out as any).__audit = {
+        resultCount: views.length
+      };
+      return out;
     });
   }
 
@@ -58,9 +62,16 @@ export function createTools(modelPath?: string) {
       // find by exact name or contains
       const v = model.views.find(x => (x.name || '').toLowerCase() === input.viewname.toLowerCase())
         || model.views.find(x => (x.name || '').toLowerCase().includes(input.viewname.toLowerCase()));
-      if (!v) return createGetViewDetailsOutput(`# View not found: ${input.viewname}`);
+      let out: GetViewDetailsOutput;
+      if (!v) {
+        out = createGetViewDetailsOutput(`# View not found: ${input.viewname}`);
+        (out as any).__audit = { found: false };
+        return out;
+      }
       const markdown = renderViewDetailsMarkdownFromModel(model, v);
-      return createGetViewDetailsOutput(markdown, v.id);
+      out = createGetViewDetailsOutput(markdown, v.id);
+      (out as any).__audit = { found: true, viewId: v.id };
+      return out;
     });
   }
 

@@ -97,7 +97,14 @@ class DailyFileLogger {
   auditToolInvocation(tool: string, params: any, fn: () => Promise<any>): Promise<any> {
     const start = Date.now();
     return fn().then(result => {
-      this.log('info', 'tool.invoke', { tool, params, durationMs: Date.now() - start, success: true });
+      // Allow tool handlers to attach lightweight audit metadata on the result as __audit
+      let auditMeta: any = undefined;
+      if (result && typeof result === 'object' && Object.prototype.hasOwnProperty.call(result, '__audit')) {
+        auditMeta = (result as any).__audit;
+        // Do not retain the internal field on the outward result
+        try { delete (result as any).__audit; } catch {}
+      }
+      this.log('info', 'tool.invoke', { tool, params, durationMs: Date.now() - start, success: true, ...(auditMeta || {}) });
       return result;
     }).catch(err => {
       this.log('error', 'tool.invoke', { tool, params, durationMs: Date.now() - start, success: false, error: (err as Error).message });

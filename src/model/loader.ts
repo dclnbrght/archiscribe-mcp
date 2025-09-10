@@ -2,6 +2,9 @@ import { ModelData, ViewObject, ElementObject, RelationshipObject } from './type
 import { readFileSync } from 'fs';
 import { watchFile } from 'fs';
 import { XMLParser } from 'fast-xml-parser';
+import { getLogger } from '../utils/logger';
+
+const logger = getLogger();
 
 function attr(obj: any, name: string) {
   if (!obj) return undefined;
@@ -30,12 +33,12 @@ export class ModelLoader {
   private initWatcher() {
     if (this.watcherInitialized) return;
     try {
-      watchFile(this.path, { persistent: true, interval: 5000 }, (curr, prev) => {
+        watchFile(this.path, { persistent: true, interval: 5000 }, (curr, prev) => {
         if (curr.mtime !== prev.mtime) {
           this.cache = undefined;
           // Log to output when file watcher triggers, with timestamp
           const ts = new Date().toISOString();
-          console.log(`[${ts}] [ModelLoader] Model file updated: ${this.path}. Cache cleared.`);
+          logger.log('info', 'model.file.update', { path: this.path });
         }
       });
       this.watcherInitialized = true;
@@ -57,9 +60,11 @@ export class ModelLoader {
       const views = this.parseViews(model, propDefs);
 
       this.cache = { views, elements, relationships } as ModelData;
+      logger.log('info', 'model.load.success', { path: this.path, views: views.length, elements: elements.length, relationships: relationships.length });
       return this.cache;
     } catch (err) {
       this.cache = { views: [], elements: [], relationships: [] };
+      logger.log('warn', 'model.load.fail', { path: this.path, error: (err as Error)?.message || String(err) });
       return this.cache;
     }
   }
