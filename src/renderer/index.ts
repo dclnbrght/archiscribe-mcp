@@ -20,6 +20,9 @@ function findRelationshipById(model: ModelData, id: string) : RelationshipObject
 export function renderViewDetailsMarkdownFromModel(model: ModelData, view: ViewObject): string {
   const lines: string[] = [];
   lines.push(`# ArchiMate View name: ${view.name}`, '');
+  if (view.viewpoint) {
+    lines.push(`> Viewpoint: ${view.viewpoint}`, '');
+  }
   if (view.documentation) lines.push(view.documentation, '');
 
   lines.push('## Elements', '');

@@ -2,6 +2,7 @@ export interface ViewObject {
   id: string;
   name: string;
   type?: string;
+  viewpoint?: string;
   documentation?: string;
   properties?: Record<string, string>;
   elements?: string[];

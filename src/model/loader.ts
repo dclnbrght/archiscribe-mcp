@@ -134,6 +134,7 @@ export class ModelLoader {
       const name = v.name ? (typeof v.name === 'string' ? v.name : v.name['#text']) : id;
       const documentation = v.documentation ? (typeof v.documentation === 'string' ? v.documentation : v.documentation['#text']) : undefined;
       const properties = this.parseProperties(v.properties, propDefs);
+      const viewpoint = attr(v, 'viewpoint');
       
       const { elementsInView, nodeHierarchy } = this.parseViewNodes(v.node);
       const relsInView = this.parseViewConnections(v.connection);
@@ -145,6 +146,7 @@ export class ModelLoader {
         name, 
         documentation, 
         properties, 
+        viewpoint,
         elements: elementsInView, 
         relationships: relsInView, 
         nodeHierarchy 

@@ -248,6 +248,12 @@ describe('ModelLoader', () => {
             expect(relationship).toBeDefined();
           });
         }
+
+        // Viewpoint check for specific view
+        if (/ArchiScribe MCP Server/i.test(view.name)) {
+          expect(view.viewpoint).toBeDefined();
+          expect(view.viewpoint).toMatch(/Implementation and Deployment/i);
+        }
       });
     });
   });
