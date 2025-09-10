@@ -64,8 +64,8 @@ async function main() {
 
   const server = createServer(async (req, res) => {
     // handle /mcp transport requests
-    const host = req.headers.host || 'localhost';
-    const url = new URL(req.url || '/', `http://${host}`);
+    const host = 'localhost';
+    const url = new URL(`http://${host}`);
     const pathname = url.pathname;
 
     if (pathname === '/mcp') {
