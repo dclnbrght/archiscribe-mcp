@@ -1,5 +1,7 @@
 # ArchiMate View name: ArchiScribe MCP Server
 
+> Viewpoint: Implementation and Deployment
+
 The Application and Technology components of the ArchiScribe MCP Server.
 More information here: https://declanbright.com/software/archiscribe-mcp-server/
 
@@ -7,7 +9,7 @@ More information here: https://declanbright.com/software/archiscribe-mcp-server/
 
 ### ArchiMate Model
 - Type: Artifact
-- Documentation: Any ArchiMate Model file, in the ArchiMate Exchange Format (an XML based interoperability standard).
+- Documentation: Any ArchiMate Model file, in the ArchiMate Exchange Format (an XML‑based interoperability standard).
 
 ### ArchiScribe MCP Server
 - Type: ApplicationComponent
