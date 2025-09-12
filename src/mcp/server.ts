@@ -39,7 +39,7 @@ export async function createMcpServer() {
         return { content: [{ type: 'text', text: out.markdown }], structuredContent: out };
       }
     );
-    console.info('MCP: registered high-level tool: SearchViews');
+    console.info('MCP: registered tool: SearchViews');
     logger.log('info', 'mcp.tool.register', { tool: 'SearchViews', highLevel: true });
 
     // Register the GetViewDetails tool
@@ -57,7 +57,7 @@ export async function createMcpServer() {
         return { content: [{ type: 'text', text: out.markdown }], structuredContent: out };
       }
     );
-    console.info('MCP: registered high-level tool: GetViewDetails');
+    console.info('MCP: registered tool: GetViewDetails');
     logger.log('info', 'mcp.tool.register', { tool: 'GetViewDetails', highLevel: true });
 
     sdkServer = server;

@@ -9,6 +9,7 @@ export interface Config {
   logPath: string;
   logLevel: 'debug' | 'info' | 'warn' | 'error';
   disclaimerPrefix?: string;
+  enableHttpEndpoints?: boolean;
 }
 
 function readSettings(): Partial<Config> {
@@ -35,6 +36,7 @@ export function loadConfig(): Config {
     viewsFilterByProperty: (process.env.VIEWS_FILTER_BY_PROPERTY || String(defaults.viewsFilterByProperty || 'false')) === 'true',
     viewsFilterPropertyName: process.env.VIEWS_FILTER_PROPERTY_NAME || defaults.viewsFilterPropertyName || 'AI-Context',
     serverPort: Number(process.env.SERVER_PORT || defaults.serverPort || 3030),
+    enableHttpEndpoints: (process.env.ENABLE_HTTP_ENDPOINTS || String((defaults as any).enableHttpEndpoints || 'false')) === 'true',
     logPath: process.env.LOG_PATH || (defaults as any).logPath || 'logs',
     logLevel: (process.env.LOG_LEVEL as any) || (defaults as any).logLevel || 'info',
     disclaimerPrefix: process.env.DISCLAIMER_PREFIX || (defaults as any).disclaimerPrefix || ''

@@ -51,7 +51,8 @@ async function handleMcpRequest(mcp: any, req: any, res: any): Promise<void> {
 }
 
 async function main() {
-  const router = new Router();
+  const enableHttp = Boolean(appService.config.enableHttpEndpoints);
+  const router = enableHttp ? new Router() : undefined;
   const mcp = await createMcpServer();
   // Start the MCP server if it has SDK backing so transports and notifications are initialized
   try {
@@ -77,7 +78,15 @@ async function main() {
       return;
     }
 
-    // Fallback to existing router for other endpoints
+    // Fallback to existing router for other endpoints (if enabled)
+    if (!enableHttp || !router) {
+      // Return 404 for any non-/mcp endpoints when HTTP endpoints are disabled
+      res.statusCode = 404;
+      res.setHeader('content-type', 'text/plain');
+      res.end('Not Found');
+      return;
+    }
+
     router.handle(req, res).catch(err => {
       res.statusCode = 500;
       res.setHeader('content-type', 'text/plain');
