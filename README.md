@@ -88,6 +88,8 @@ On successful startup, you should see:
 MCP SDK: using high-level McpServer API
 MCP: registered tool: SearchViews
 MCP: registered tool: GetViewDetails
+MCP: registered tool: SearchElements
+MCP: registered tool: GetElementDetails
 Server listening on port 3030
 ```
 
@@ -133,7 +135,7 @@ Supports both absolute and relative paths. Restart the server after changes.
 
 ## MCP Tools
 
-The server exposes two MCP tools:
+The server exposes four MCP tools:
 
 ### SearchViews
 
@@ -144,6 +146,18 @@ The server exposes two MCP tools:
 
 - **Input**: `viewname` (required string) — exact name of the view
 - **Output**: Markdown document with metadata, elements, and relationships
+
+### SearchElements
+
+- **Input**:
+  - `query` (optional string) — keyword to search element names, documentation, and properties
+  - `type` (optional string) — filter elements by ArchiMate type (e.g., "ApplicationComponent", "SystemSoftware")
+- **Output**: Markdown list of matching elements with their types
+
+### GetElementDetails
+
+- **Input**: `elementname` (required string) — name of the element to retrieve
+- **Output**: Markdown document with element metadata, properties, referenced views, and relationships
 
 ---
 
@@ -156,6 +170,13 @@ Quick testing via HTTP endpoints (disabled by default, see advanced configuratio
 
 - GET `/views/{viewname}`
   - Returns detailed markdown for the specified view.
+
+- GET `/elements?query=<keyword>&type=<type>`
+  - Returns a markdown list of elements matching the keyword and/or type.
+  - Both query and type parameters are optional.
+
+- GET `/elements/{elementname}`
+  - Returns detailed markdown for the specified element.
 
 ---
 
