@@ -106,15 +106,62 @@ export class ModelLoader {
 
   private parseElements(model: any, propDefs: Map<string, string>): ElementObject[] {
     const elementsRaw = asArray<any>(model.elements && model.elements.element);
-    return elementsRaw.map((el: any) => {
+    const elements = elementsRaw.map((el: any) => {
       const id = attr(el, 'identifier') || attr(el, 'id');
       const type = attr(el, 'type');
       const name = el.name ? (typeof el.name === 'string' ? el.name : el.name['#text']) : id;
       const documentation = el.documentation ? (typeof el.documentation === 'string' ? el.documentation : el.documentation['#text']) : undefined;
       const properties = this.parseProperties(el.properties, propDefs);
       
-      return { id, type, name, documentation, properties } as ElementObject;
+      return { 
+        id, 
+        type, 
+        name, 
+        documentation, 
+        properties,
+        inViews: [],
+        outgoingRelations: [],
+        incomingRelations: []
+      } as ElementObject;
     });
+
+    // Post-process to populate relationship and view references
+    const viewsRaw = asArray<any>((model.views && model.views.diagrams && model.views.diagrams.view) || (model.views && model.views.view));
+    const relsRaw = asArray<any>(model.relationships && model.relationships.relationship);
+    
+    // Map for quick element lookup
+    const elementMap = new Map(elements.map(e => [e.id, e]));
+    
+    // Add view references
+    for (const view of viewsRaw) {
+      const viewId = attr(view, 'identifier') || attr(view, 'id');
+      const { elementsInView } = this.parseViewNodes(view.node);
+      for (const elementId of elementsInView) {
+        const element = elementMap.get(elementId);
+        if (element && !element.inViews!.includes(viewId)) {
+          element.inViews!.push(viewId);
+        }
+      }
+    }
+    
+    // Add relationship references
+    for (const rel of relsRaw) {
+      const relId = attr(rel, 'identifier') || attr(rel, 'id');
+      const sourceId = attr(rel, 'source');
+      const targetId = attr(rel, 'target');
+      
+      const source = elementMap.get(sourceId);
+      const target = elementMap.get(targetId);
+      
+      if (source && !source.outgoingRelations!.includes(relId)) {
+        source.outgoingRelations!.push(relId);
+      }
+      if (target && !target.incomingRelations!.includes(relId)) {
+        target.incomingRelations!.push(relId);
+      }
+    }
+    
+    return elements;
   }
 
   private parseRelationships(model: any, propDefs: Map<string, string>): RelationshipObject[] {

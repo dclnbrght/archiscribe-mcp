@@ -41,6 +41,32 @@ export class Router {
         res.end(out.markdown);
         return;
       }
+
+      if (req.method === 'GET' && pathname === '/elements') {
+        const q = (url.query && (url.query.q || url.query.query)) || url.query?.query || '';
+        const type = url.query?.type || '';
+        const input = { query: String(q || ''), type: String(type || '') };
+        const out = await logger.auditHttpInvocation(
+          'GET', '/elements', input, 
+          async () => appService.tools.searchElementsHandler(input)
+        );
+        res.statusCode = 200;
+        res.setHeader('content-type', 'text/markdown');
+        res.end(out.markdown);
+        return;
+      }
+
+      if (req.method === 'GET' && pathname && pathname.startsWith('/elements/')) {
+        const name = decodeURIComponent(pathname.replace('/elements/', ''));
+        const out = await logger.auditHttpInvocation(
+          'GET', '/elements/:name', { elementname: name }, 
+          async () => appService.tools.getElementDetailsHandler({ elementname: name })
+        );
+        res.statusCode = 200;
+        res.setHeader('content-type', 'text/markdown');
+        res.end(out.markdown);
+        return;
+      }
     } catch (err: any) {
       res.statusCode = 500;
       res.setHeader('content-type', 'text/plain');

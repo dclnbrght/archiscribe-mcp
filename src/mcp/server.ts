@@ -60,6 +60,43 @@ export async function createMcpServer() {
     console.info('MCP: registered tool: GetViewDetails');
     logger.log('info', 'mcp.tool.register', { tool: 'GetViewDetails', highLevel: true });
 
+    // Register the SearchElements tool
+    server.registerTool(
+      'SearchElements',
+      {
+        title: 'Search Elements',
+        description: 'Search elements in the ArchiMate model by name, type, or documentation',
+        inputSchema: { 
+          query: z.string().optional().describe('Search keyword to filter element names, documentation, and properties'),
+          type: z.string().optional().describe('Filter elements by type')
+        },
+      },
+      async (args: { query?: string, type?: string }) => {
+        const out = await tools.searchElementsHandler({ query: args?.query, type: args?.type });
+        return { content: [{ type: 'text', text: out.markdown }], structuredContent: out };
+      }
+    );
+    console.info('MCP: registered tool: SearchElements');
+    logger.log('info', 'mcp.tool.register', { tool: 'SearchElements', highLevel: true });
+
+    // Register the GetElementDetails tool
+    server.registerTool(
+      'GetElementDetails',
+      {
+        title: 'Get Element Details',
+        description: 'Get detailed markdown for a named element in the ArchiMate model',
+        inputSchema: { 
+          elementname: z.string().describe('The name of the element to retrieve details for') 
+        },
+      },
+      async (args: { elementname: string }) => {
+        const out = await tools.getElementDetailsHandler({ elementname: args.elementname });
+        return { content: [{ type: 'text', text: out.markdown }], structuredContent: out };
+      }
+    );
+    console.info('MCP: registered tool: GetElementDetails');
+    logger.log('info', 'mcp.tool.register', { tool: 'GetElementDetails', highLevel: true });
+
     sdkServer = server;
   } catch (err) {
     // SDK not available or registration failed; continue with in-process tools only

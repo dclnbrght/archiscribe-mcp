@@ -1,5 +1,5 @@
 import { ModelLoader } from '../model/loader';
-import { renderViewListMarkdown, renderViewDetailsMarkdownFromModel } from '../renderer';
+import { renderViewListMarkdown, renderViewDetailsMarkdownFromModel, renderElementListMarkdown, renderElementDetailsMarkdownFromModel } from '../renderer';
 import { loadConfig } from '../config';
 import { getLogger } from '../utils/logger';
 
@@ -22,12 +22,40 @@ export interface GetViewDetailsOutput {
   [key: string]: unknown; // MCP compatibility
 }
 
+export interface SearchElementsInput {
+  query?: string;
+  type?: string;
+}
+
+export interface SearchElementsOutput {
+  markdown: string;
+  [key: string]: unknown; // MCP compatibility
+}
+
+export interface GetElementDetailsInput {
+  elementname: string;
+}
+
+export interface GetElementDetailsOutput {
+  id?: string;
+  markdown: string;
+  [key: string]: unknown; // MCP compatibility
+}
+
 // Helper functions to ensure type safety while maintaining MCP compatibility
 function createSearchViewsOutput(markdown: string): SearchViewsOutput {
   return { markdown };
 }
 
 function createGetViewDetailsOutput(markdown: string, id?: string): GetViewDetailsOutput {
+  return { markdown, id };
+}
+
+function createSearchElementsOutput(markdown: string): SearchElementsOutput {
+  return { markdown };
+}
+
+function createGetElementDetailsOutput(markdown: string, id?: string): GetElementDetailsOutput {
   return { markdown, id };
 }
 
@@ -82,7 +110,62 @@ export function createTools(modelPath?: string) {
     });
   }
 
-  return { searchViewsHandler, getViewDetailsHandler, loader };
+  async function searchElementsHandler(input: SearchElementsInput): Promise<SearchElementsOutput> {
+    return logger.auditToolInvocation('SearchElements', input, async () => {
+      const q = input?.query ? String(input.query).toLowerCase() : '';
+      const t = input?.type ? String(input.type).toLowerCase() : '';
+      const model = loader.load();
+      let elements = model.elements || [];
+
+      // Filter by query (name or documentation)
+      if (q) {
+        elements = elements.filter(e => 
+          (e.name || '').toLowerCase().includes(q) || 
+          (e.documentation || '').toLowerCase().includes(q) ||
+          Object.entries(e.properties || {}).some(([key, value]) => 
+            String(key || '').toLowerCase().includes(q) || String(value || '').toLowerCase().includes(q)
+          )
+        );
+      }
+
+      // Filter by type if specified
+      if (t) {
+        elements = elements.filter(e => (e.type || '').toLowerCase().includes(t));
+      }
+
+      const markdown = withDisclaimer(renderElementListMarkdown(elements));
+      const out = createSearchElementsOutput(markdown);
+      (out as any).__audit = {
+        resultCount: elements.length
+      };
+      return out;
+    });
+  }
+
+  async function getElementDetailsHandler(input: GetElementDetailsInput): Promise<GetElementDetailsOutput> {
+    return logger.auditToolInvocation('GetElementDetails', input, async () => {
+      if (!input || !input.elementname) throw new Error('elementname required');
+      const model = loader.load();
+
+      // Find element by exact name or contains
+      const element = model.elements.find(x => (x.name || '').toLowerCase() === input.elementname.toLowerCase())
+        || model.elements.find(x => (x.name || '').toLowerCase().includes(input.elementname.toLowerCase()));
+
+      let out: GetElementDetailsOutput;
+      if (!element) {
+        out = createGetElementDetailsOutput(`# Element not found: ${input.elementname}`);
+        (out as any).__audit = { found: false };
+        return out;
+      }
+
+      const markdown = withDisclaimer(renderElementDetailsMarkdownFromModel(model, element));
+      out = createGetElementDetailsOutput(markdown, element.id);
+      (out as any).__audit = { found: true, elementId: element.id };
+      return out;
+    });
+  }
+
+  return { searchViewsHandler, getViewDetailsHandler, searchElementsHandler, getElementDetailsHandler, loader };
 }
 
 export type ToolsFactory = ReturnType<typeof createTools>;

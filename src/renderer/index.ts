@@ -114,3 +114,78 @@ export function renderViewDetailsMarkdownFromModel(model: ModelData, view: ViewO
 
   return lines.join('\n');
 }
+
+export function renderElementListMarkdown(elements: ElementObject[]): string {
+  if (!elements || elements.length === 0) return '# Elements\n\n_No elements found_';
+  
+  const lines: string[] = ['# ArchiMate Elements', ''];
+  for (const el of elements) {
+    lines.push(`- ${el.name} (${el.type || 'Unknown Type'})`);
+  }
+  return lines.join('\n');
+}
+
+export function renderElementDetailsMarkdownFromModel(model: ModelData, element: ElementObject): string {
+  const lines: string[] = [];
+  lines.push(`# ArchiMate Element: ${element.name}`, '');
+  
+  if (element.type) lines.push(`**Type:** ${element.type}`, '');
+  if (element.documentation) lines.push(element.documentation, '');
+
+  // Properties
+  if (element.properties && Object.keys(element.properties).length > 0) {
+    lines.push('## Properties', '');
+    for (const [key, value] of Object.entries(element.properties)) {
+      lines.push(`- ${key}: ${value}`);
+    }
+    lines.push('');
+  }
+
+  // Views containing this element
+  if (element.inViews && element.inViews.length > 0) {
+    lines.push('## Referenced in Views', '');
+    for (const viewId of element.inViews) {
+      const view = model.views.find(v => v.id === viewId);
+      if (view) {
+        lines.push(`- ${view.name}`);
+      }
+    }
+    lines.push('');
+  }
+
+  // Relationships
+  const outgoing = element.outgoingRelations?.map(rid => model.relationships.find(r => r.id === rid)).filter(r => r) || [];
+  const incoming = element.incomingRelations?.map(rid => model.relationships.find(r => r.id === rid)).filter(r => r) || [];
+
+  if (outgoing.length > 0 || incoming.length > 0) {
+    lines.push('## Relationships', '');
+    
+    if (outgoing.length > 0) {
+      lines.push('### Outgoing Relationships', '');
+      for (const rel of outgoing) {
+        if (!rel) continue;
+        const target = model.elements.find(e => e.id === rel.targetId);
+        lines.push(`- To **${target?.name || rel.targetId}**`);
+        if (rel.type) lines.push(`  - Type: ${rel.type}`);
+        if (rel.name) lines.push(`  - Name: ${rel.name}`);
+        if (rel.documentation) lines.push(`  - Documentation: ${rel.documentation}`);
+        lines.push('');
+      }
+    }
+
+    if (incoming.length > 0) {
+      lines.push('### Incoming Relationships', '');
+      for (const rel of incoming) {
+        if (!rel) continue;
+        const source = model.elements.find(e => e.id === rel.sourceId);
+        lines.push(`- From **${source?.name || rel.sourceId}**`);
+        if (rel.type) lines.push(`  - Type: ${rel.type}`);
+        if (rel.name) lines.push(`  - Name: ${rel.name}`);
+        if (rel.documentation) lines.push(`  - Documentation: ${rel.documentation}`);
+        lines.push('');
+      }
+    }
+  }
+
+  return lines.join('\n');
+}

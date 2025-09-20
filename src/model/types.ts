@@ -16,6 +16,9 @@ export interface ElementObject {
   type?: string;
   documentation?: string;
   properties?: Record<string, string>;
+  inViews?: string[];          // IDs of views containing this element
+  outgoingRelations?: string[]; // IDs of relationships where this element is the source
+  incomingRelations?: string[]; // IDs of relationships where this element is the target
 }
 
 export interface RelationshipObject {
