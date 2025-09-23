@@ -95,8 +95,9 @@ export function createTools(modelPath?: string) {
       if (!input || !input.viewname) throw new Error('viewname required');
       const model = loader.load();
       // find by exact name or contains
-      const v = model.views.find(x => (x.name || '').toLowerCase() === input.viewname.toLowerCase())
-        || model.views.find(x => (x.name || '').toLowerCase().includes(input.viewname.toLowerCase()));
+      const searchName = String(input.viewname || '').toLowerCase();
+      const v = model.views.find(x => String(x.name || '').toLowerCase() === searchName)
+        || model.views.find(x => String(x.name || '').toLowerCase().includes(searchName));
       let out: GetViewDetailsOutput;
       if (!v) {
         out = createGetViewDetailsOutput(`# View not found: ${input.viewname}`);
