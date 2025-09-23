@@ -16,11 +16,11 @@ export async function createMcpServer() {
     // Try to load the high-level McpServer (preferred approach)
     const { McpServer } = await import('@modelcontextprotocol/sdk/server/mcp.js');
     
-    console.info('MCP SDK: using high-level McpServer API');
-    logger.log('info', 'mcp.init', { message: 'Using high-level McpServer API' });
+    console.info('MCP: initialising server');
+    logger.log('info', 'mcp.init', { message: 'initialising server' });
     
     const server = new McpServer(
-      { name: 'ArchiScribe MCP', version: '0.1.0' }, 
+      { name: 'ArchiScribe MCP', version: '1.0.0' }, 
       { capabilities: { tools: { listChanged: true } } }
     );
 
